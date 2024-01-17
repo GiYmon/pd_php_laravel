@@ -27,12 +27,17 @@ cp .env.example .env
 docker compose up -d
 ```
 
- 4. Perform database migrations and seeding:
+4. Install dependencies
+```bash
+docker compose exec app composer install
+```
 
- ```bash
- docker compose exec app php artisan migrate
- docker compose exec app php artisan db:seed
- ```
+5. Perform database migrations and seeding:
 
- 5. After the containers have started, the application should be accessible at http://localhost:8080.
+```bash
+docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
+```
+
+6. After the containers have started, the application should be accessible at http://localhost:8080.
 
