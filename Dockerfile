@@ -1,8 +1,5 @@
+# Use PHP 8.2 FPM
 FROM php:8.2-fpm
-
-# Set default values for user and uid arguments
-ARG user=laraveluser
-ARG uid=1000
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -11,22 +8,33 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    zip \
+    unzip
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Get Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Create a system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user \
-    && mkdir -p /home/$user/.composer \
-    && chown -R $user:$user /home/$user
-
 # Set working directory
 WORKDIR /var/www
 
-# Switch to the new user
-USER $user
+# Copy existing application directory contents
+COPY . /var/www
+
+# Copy existing application directory permissions
+COPY --chown=www-data:www-data . /var/www
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install project dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Change ownership of our applications
+RUN chown -R www-data:www-data /var/www
+
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+CMD ["php-fpm"]
