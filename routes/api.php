@@ -18,5 +18,6 @@ use App\Http\Controllers\JobController;
 
 Route::prefix("v1")->group(function () {
     Route::post("/create", [JobController::class, "store"]);
+    Route::get("/job-status/{statusId}", [JobController::class, "checkJobStatus"]);
 });
 

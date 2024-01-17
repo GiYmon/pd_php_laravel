@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\JobRequest;
 use App\Jobs\GenerateRandomArray;
 use App\Models\JobStatus;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
@@ -27,5 +26,24 @@ class JobController extends Controller
             "message" => "Task has been added to the queue",
             "jobId" => $jobStatus->id,
         ]);
+    }
+
+    public function checkJobStatus($jobId)
+    {
+        $jobStatus = JobStatus::find($jobId);
+
+        if (!$jobStatus) {
+            return response()->json(["message" => "Job status not found"], 404);
+        }
+
+        if ($jobStatus->status !== JobStatus::STATUS_DONE) {
+            return response()->json([
+                "status" => $jobStatus->status,
+            ]);
+        } else {
+            return response()->json([
+                "result" => json_decode($jobStatus->result),
+            ]);
+        }
     }
 }
