@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\JobRequest;
 use App\Jobs\GenerateRandomArray;
+use App\Models\JobStatus;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -13,13 +14,18 @@ class JobController extends Controller
     {
         $validated = $request->validated();
         $x = $validated["x"];
+        
+        // Save Job with Pending status
+        $jobStatus = JobStatus::create([
+            "status" => JobStatus::STATUS_PENDING,
+        ]);
 
-        GenerateRandomArray::dispatch($x);
-
+        // Dispatch job
+        GenerateRandomArray::dispatch($x, $jobStatus->id);
 
         return response()->json([
-            "message" => "Received value x.",
-            "x" => $x,
+            "message" => "Task has been added to the queue",
+            "jobId" => $jobStatus->id,
         ]);
     }
 }
