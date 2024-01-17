@@ -16,18 +16,23 @@ git clone https://github.com/GiYmon/pd_php_laravel.git
 cd pd_php_laravel
 ```
 
-2. Start the Docker containers:
+2. Copy the example env file
+```bash
+cp .env.example .env
+```
+
+3. Start the Docker containers:
 
 ```bash
 docker compose up -d
 ```
 
- 3. Perform database migrations and seeding:
+ 4. Perform database migrations and seeding:
 
  ```bash
  docker compose exec app php artisan migrate
  docker compose exec app php artisan db:seed
  ```
 
- 4. After the containers have started, the application should be accessible at http://localhost:8080.
+ 5. After the containers have started, the application should be accessible at http://localhost:8080.
 
